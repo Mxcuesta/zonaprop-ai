@@ -1,0 +1,33 @@
+---
+description: How to structure code, pin libraries, and keep a working path
+alwaysApply: true
+---
+
+# Writing code
+
+On an empty repo, choose a small layout and keep using it. On a repo that already has code, follow the layout, the language, and the dependency manifest already there.
+
+## Shape
+
+- One entry command, documented where the repo documents commands. On a new repo that place is the README. Implementation lives in a package (`src/` when the repo has no layout yet, otherwise the layout already in use), not in a script dropped next to generated output.
+- A name is the meaning of the value (`created_at`), not the order it was seen (`value_0`) and not the wire format (`response_field_3`).
+- One module owns one job. Do not split a module until a second caller needs it.
+- Delete code the new path made unreachable in the same change. Leave a function in the file only when a caller still uses it.
+- User-facing text uses one language: the language the repo already uses, or the language of the request when the repo has none. Identifiers follow the code already in the repo. In an empty repo, pick one language for identifiers and stay with it.
+- Parallelize independent calls only after one call is proven. Default the worker count and expose it as a flag. Each worker gets its own client session.
+- When a run writes a file, print the output path and the count of what was saved.
+
+## Libraries
+
+- Install into `.venv` at the project root. Declare the dependency in the manifest the repo already uses, pinned to the version that was tested. This repo uses `requirements.txt`. On a new Python app, use `requirements.txt` too.
+- Use `pyproject.toml` when the project is an installable package, or when tool settings (pytest, ruff) need one config file. Do not add one beside `requirements.txt` unless that is the reason.
+- Use the standard library and packages already declared before adding one. On an empty repo, start from the standard library.
+- External I/O goes through one small module. The rest of the program does not import that client library in every file.
+- Prove a new library with one real call before wiring it through the run. If that call fails, stop. Do not build the feature on top of a failed probe.
+- To try an alternative without losing the current behavior, add it behind the same module and select it explicitly. Keep the path that already works.
+- Do not upgrade a pinned package as a side effect. If an upgrade was installed only to test, restore the pin unless the tested version is what the project now requires.
+- Do not commit `.venv`, `.env`, caches, local browser state, or generated datasets. `.env` holds secrets and stays out of git. If the repo already tracks one of those paths, leave that choice as it is.
+
+## A change that grows the surface
+
+Update the repo's docs in the same change when the command, the flags, or the written output change. The docs describe what the command accepts and what the output contains.

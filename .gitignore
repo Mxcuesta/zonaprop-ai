@@ -1,0 +1,37 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+*.egg-info/
+dist/
+build/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Generated datasets
+data/
+*.csv
+
+# Local browser state
+.playwright/
+playwright-report/
+browser_data/
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Cursor local state. Rules and skills stay in the repo.
+.cursor/*
+!.cursor/rules/
+!.cursor/skills/

@@ -1,0 +1,40 @@
+# zonaprop-ai
+
+Course repository for **AI & Data Science for Economists**.
+
+You will use the Cursor agent to download a public real-estate search into a CSV, keep one documented command, and compare the row count with the total the site announces.
+
+## Before you start
+
+Install these tools:
+
+- [Node.js](https://nodejs.org/) 20 or newer (the current LTS)
+- [Python](https://www.python.org/downloads/) 3.11 or newer
+- The latest version of [Git](https://git-scm.com/downloads)
+- The latest version of [Cursor](https://cursor.com/)
+
+Create a [GitHub account](https://github.com/signup).
+
+Fork [cbrutomeso/zonaprop-ai](https://github.com/cbrutomeso/zonaprop-ai), then clone your fork and open it in Cursor:
+
+```bash
+git clone https://github.com/YOUR_USERNAME/zonaprop-ai.git
+cd zonaprop-ai
+```
+
+The agent instructions for this assignment are in `.cursor/` and come with the clone.
+
+## First prompt
+
+Paste this as the first message to the Cursor agent:
+
+```text
+Bajá a un CSV todos los resultados de esta búsqueda:
+https://www.zonaprop.com.ar/casas-departamentos-ph-venta-capital-federal.html
+
+Campos que necesito, con nombres fijos: precio en USD, barrio, ambientes, dormitorios, baños, descripción, tipo (casa, departamento, ph o terreno) y superficie total, cubierta y descubierta.
+
+Sumá las columnas que sirvan para un análisis o un modelo. Dejá un solo comando documentado y decime cuántas filas quedaron contra el total que anuncia el sitio.
+```
+
+The CSV belongs in `data/`. That directory is gitignored, so the download stays on your machine and is not part of what you push.
