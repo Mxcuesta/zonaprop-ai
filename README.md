@@ -2,7 +2,32 @@
 
 Course repository for **AI & Data Science for Economists**.
 
-You will use the Cursor agent to download a public real-estate search into a CSV, keep one documented command, and compare the row count with the total the site announces.
+The repo downloads a public ZonaProp real-estate search (sale listings in Capital Federal) into a CSV, then analyzes it from an economic point of view in a Jupyter notebook. You will use an AI agent (Cursor or Claude Code) to build the download, keep one documented command, and compare the row count with the total the site announces.
+
+## Project structure
+
+```text
+zonaprop-ai/
+├── src/scrape.py                      # the download command (single entry point)
+├── data/                              # generated CSVs (gitignored)
+├── notebooks/analisis_economico.ipynb # economic analysis of the CSV
+├── prompts/analisis_base.md           # base prompt to ask an agent for the analysis
+├── CLAUDE.md                          # instructions for Claude Code
+├── .cursor/                           # rules and skills for Cursor
+└── .claude/skills/web-scraping/       # scraping skill for Claude Code
+```
+
+## Quick start
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate          # Windows (macOS/Linux: source .venv/bin/activate)
+pip install pandas numpy matplotlib seaborn jupyter
+
+python src/scrape.py https://www.zonaprop.com.ar/casas-departamentos-ph-venta-capital-federal.html --workers 6
+```
+
+The download uses only the Python standard library. The extra packages are for the notebook. Open `notebooks/analisis_economico.ipynb` and run it from top to bottom.
 
 ## Before you start
 
@@ -91,3 +116,17 @@ python src/scrape.py https://www.zonaprop.com.ar/casas-departamentos-ph-venta-ca
 `url` is the search page. `--workers` is how many slices download at once (default 6). Each worker uses its own HTTP session and requests that slice's pages one after another: concurrent requests for different pages of the same search repeat listings. The command writes `data/<slug>.csv` and prints that path, the unique row count, the total the site announced at the start of the run, and how many page requests failed.
 
 The first page is HTML. The records are in `window.__PRELOADED_STATE__`. Changing page loads `...-pagina-N.html` and also POSTs `/rplis-api/postings` with the filters already applied (`pagina`, operation, property types, location). Deep HTML answers with a Cloudflare check while that POST still returns the page you asked for, until a cap: past it, `currentPage` is no longer the page requested or the first listing id repeats page 1. That cap is far below the advertised page count, and pages past about 140 in a single slice start repeating listings already saved. The default order (relevance) repeats listings even earlier, so the download asks for the same filters ordered by most recent, which announces the same total. Slices above that page window are split with the property-type filter from the page, then by USD price, and deduplicated by listing id. The room filter is not a partition: listings with no room count fall out of every bucket. `precio_usd` and the square-meter columns stay empty when the source value is in another unit. `superficie_descubierta` is the published figure, or total minus covered when both are in m².
+
+## Analysis notebook
+
+[notebooks/analisis_economico.ipynb](notebooks/analisis_economico.ipynb) reads `data/casas-departamentos-ph-venta-capital-federal.csv` and covers: cleaning, price and price-per-m² statistics, comparison by property type and neighborhood (top 15), rooms vs. price, expensas, and who advertises (inmobiliaria vs. particular), closing with an executive summary.
+
+[prompts/analisis_base.md](prompts/analisis_base.md) is a base prompt to ask an agent for this kind of analysis. It lists the known data problems to check first: impossible prices and surfaces, empty columns, listings in pesos, and mis-encoded neighborhood names. Prices are asking prices, not closing prices.
+
+## Working with Claude Code
+
+[CLAUDE.md](CLAUDE.md) holds the project rules (one documented command, code in `src/`, failures counted instead of aborting, no committing `data/` or `.env`). The `web-scraping` skill in `.claude/skills/` applies when you ask the agent to scrape or download listings.
+
+## License
+
+See [LICENSE](LICENSE).
