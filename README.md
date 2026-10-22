@@ -11,6 +11,8 @@ zonaprop-ai/
 ├── src/scrape.py                      # the download command (single entry point)
 ├── data/                              # generated CSVs (gitignored)
 ├── notebooks/analisis_economico.ipynb # economic analysis of the CSV
+├── docs/index.html                    # static report (GitHub Pages)
+├── requirements.txt                   # pinned dependencies
 ├── prompts/analisis_base.md           # base prompt to ask an agent for the analysis
 ├── CLAUDE.md                          # instructions for Claude Code
 ├── .cursor/                           # rules and skills for Cursor
@@ -22,7 +24,7 @@ zonaprop-ai/
 ```bash
 python -m venv .venv
 .venv\Scripts\activate          # Windows (macOS/Linux: source .venv/bin/activate)
-pip install pandas numpy matplotlib seaborn jupyter
+pip install -r requirements.txt
 
 python src/scrape.py https://www.zonaprop.com.ar/casas-departamentos-ph-venta-capital-federal.html --workers 6
 ```
@@ -122,6 +124,17 @@ The first page is HTML. The records are in `window.__PRELOADED_STATE__`. Changin
 [notebooks/analisis_economico.ipynb](notebooks/analisis_economico.ipynb) reads `data/casas-departamentos-ph-venta-capital-federal.csv` and covers: cleaning, price and price-per-m² statistics, comparison by property type and neighborhood (top 15), rooms vs. price, expensas, and who advertises (inmobiliaria vs. particular), closing with an executive summary.
 
 [prompts/analisis_base.md](prompts/analisis_base.md) is a base prompt to ask an agent for this kind of analysis. It lists the known data problems to check first: impossible prices and surfaces, empty columns, listings in pesos, and mis-encoded neighborhood names. Prices are asking prices, not closing prices.
+
+## Reproduce and publish the report
+
+```bash
+pip install -r requirements.txt
+python src/scrape.py <url> --workers 6          # writes data/<slug>.csv
+cd notebooks
+jupyter nbconvert --to html --execute --no-input analisis_economico.ipynb --output-dir ../docs --output index.html
+```
+
+The notebook has no random steps, so the same CSV gives the same numbers. The result changes only when you download new listings. `docs/index.html` is the static report: text, tables and charts without code. To publish it, enable GitHub Pages (Settings → Pages → Deploy from a branch → `docs/`). The page shows aggregated results only; the CSV stays out of git.
 
 ## Working with Claude Code
 
